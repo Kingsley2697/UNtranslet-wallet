@@ -1,33 +1,35 @@
-const navItems = ['Home', 'Company', 'Trading', 'Program']
+import { useMemo, useState } from 'react'
+
+type Category = 'Construction' | 'Staff' | 'Suppliers'
+type Payee = { id: number; initials: string; name: string; role: string; category: Category; lastPayment: string; amount: string; status: 'Ready' | 'Pending' }
+const payees: Payee[] = [
+  { id: 1, initials: 'JM', name: 'Joseph Mbeki', role: 'Site supervisor', category: 'Construction', lastPayment: '12 Sep 2026', amount: '$2,400.00', status: 'Ready' },
+  { id: 2, initials: 'AR', name: 'Aisha Rahman', role: 'Electrician', category: 'Construction', lastPayment: '12 Sep 2026', amount: '$1,850.00', status: 'Ready' },
+  { id: 3, initials: 'TO', name: 'Thomas Okoro', role: 'Project manager', category: 'Staff', lastPayment: '05 Sep 2026', amount: '$3,750.00', status: 'Ready' },
+  { id: 4, initials: 'NK', name: 'Nadia Khan', role: 'Finance coordinator', category: 'Staff', lastPayment: '05 Sep 2026', amount: '$3,200.00', status: 'Pending' },
+  { id: 5, initials: 'AB', name: 'Atlas Building Ltd', role: 'Materials supplier', category: 'Suppliers', lastPayment: '28 Aug 2026', amount: '$8,640.00', status: 'Ready' },
+]
+const activity = [['Atlas Building Ltd', 'Supplier payment', '-$8,640.00', 'Today, 09:42', 'AB'], ['Incoming transfer', 'From Sarah K. · Personal', '+$750.00', 'Yesterday, 16:20', 'SK'], ['Construction payroll', '18 recipients', '-$24,950.00', '12 Sep 2026', '18']]
 
 export default function App() {
-  return (
-    <div className="landing-page">
-      <header className="site-header">
-        <a className="brand" href="#home" aria-label="UNtranslet Wallet home">A2B</a>
-        <nav className="main-nav" aria-label="Main navigation">
-          {navItems.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}{item !== 'Home' && <span className="chevron" aria-hidden="true" />}</a>)}
-        </nav>
-        <div className="actions">
-          <button className="login">Login</button>
-          <button className="signup">Signup</button>
-        </div>
-      </header>
-
-      <main id="home" className="hero">
-        <div className="hero-copy">
-          <h1>Trade with<br />Confidence.<br />Invest Globally.</h1>
-          <button className="hero-cta">Sign Up Now</button>
-        </div>
-
-        <div className="trading-art" aria-label="UNtranslet Wallet trading illustration">
-          <div className="grid-glow" />
-          <div className="container container-gold"><span>GOLD</span></div>
-          <div className="container container-aapl"><span>AAPL</span></div>
-          <div className="container container-wallet"><span>UNtranslet<br />Wallet</span></div>
-          <div className="orb"><i /></div>
-        </div>
-      </main>
-    </div>
-  )
+  const [account, setAccount] = useState<'business' | 'personal'>('business')
+  const [category, setCategory] = useState<Category | 'All'>('All')
+  const [selected, setSelected] = useState<number[]>([])
+  const [notice, setNotice] = useState('')
+  const [showAdd, setShowAdd] = useState(false)
+  const shown = useMemo(() => category === 'All' ? payees : payees.filter(p => p.category === category), [category])
+  const count = (c: Category) => payees.filter(p => p.category === c).length
+  const action = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(''), 3200) }
+  const toggle = (id: number) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
+  return <div className="shell">
+    <aside className="sidebar"><a className="logo" href="#top"><span>UN</span><i></i><span>tranlet</span></a><div className="workspace"><span>WORKSPACE</span><button className="company-select">Horizon Works <b>⌄</b></button></div><nav><a className="nav-item active" href="#overview"><em>⌂</em> Overview</a><a className="nav-item" href="#transactions"><em>↗</em> Transactions</a><a className="nav-item" href="#payees"><em>♙</em> Payee administrator</a><a className="nav-item" href="#reports"><em>▤</em> Reports</a></nav><div className="sidebar-bottom"><a className="nav-item" href="#support"><em>?</em> Help & support</a><a className="nav-item" href="#settings"><em>⚙</em> Settings</a><div className="profile"><div className="avatar small">EM</div><div><strong>Elena Martin</strong><span>Administrator</span></div><b>•••</b></div></div></aside>
+    <main id="top" className="content"><header className="topbar"><button className="mobile-logo" aria-label="Menu">☰</button><div className="crumb"><span>Accounts</span><b>/</b><strong>{account === 'business' ? 'Business account' : 'Personal account'}</strong></div><div className="top-actions"><button className="icon-button" aria-label="Notifications">♧<i></i></button><button className="avatar">EM</button></div></header>
+      <section className="account-switcher"><button onClick={() => setAccount('business')} className={account === 'business' ? 'account-card chosen' : 'account-card'}><span className="account-icon business-icon">▦</span><span><small>BUSINESS ACCOUNT</small><strong>Horizon Works Ltd.</strong><b>$128,420.75</b></span>{account === 'business' && <i>✓</i>}</button><button onClick={() => setAccount('personal')} className={account === 'personal' ? 'account-card chosen' : 'account-card'}><span className="account-icon personal-icon">♙</span><span><small>PERSONAL ACCOUNT</small><strong>Elena Martin</strong><b>$6,842.30</b></span>{account === 'personal' && <i>✓</i>}</button></section>
+      {account === 'business' ? <><section id="overview" className="welcome"><div><p>GOOD MORNING, ELENA</p><h1>Business overview</h1><span>Here’s what’s happening with Horizon Works today.</span></div><button className="outline-btn" onClick={() => action('Your September statement is being prepared.')}>↓ Download statement</button></section>
+      <section className="metrics"><article className="balance-card"><div className="balance-label"><span>AVAILABLE BALANCE</span><button>•••</button></div><h2>$128,420<span>.75</span></h2><p><b>↑ 8.4%</b> compared to last month</p><div className="balance-actions"><button onClick={() => action('Payment flow opened.')}>↑ Send money</button><button onClick={() => action('Funding options opened.')}>↓ Add funds</button></div></article><article className="metric"><div className="metric-icon amber">↗</div><span>OUTGOING THIS MONTH</span><strong>$47,680.00</strong><p><b>↑ 12.6%</b> vs. last month</p></article><article className="metric"><div className="metric-icon blue">▣</div><span>PAYEES</span><strong>36</strong><p>Across 3 categories</p></article></section>
+      <section id="payees" className="section-head"><div><p>PAYEE ADMINISTRATOR</p><h2>Manage your payees</h2><span>Add, organise and pay your teams in one place.</span></div><div><button className="outline-btn" onClick={() => action('Bulk payment draft created for selected payees.')}>▤ Bulk pay {selected.length > 0 && `(${selected.length})`}</button><button className="primary-btn" onClick={() => setShowAdd(true)}>＋ Add payee</button></div></section>
+      <section className="payee-admin"><div className="category-tabs">{(['All', 'Construction', 'Staff', 'Suppliers'] as const).map(x => <button key={x} onClick={() => setCategory(x)} className={category === x ? 'selected' : ''}>{x}{x !== 'All' && <span>{count(x)}</span>}</button>)}</div><div className="payee-toolbar"><div className="search">⌕ <input aria-label="Search payees" placeholder="Search payees" /></div><button className="filter">☷ Filter <span>⌄</span></button></div><div className="payee-table"><div className="table-row table-head"><span><input type="checkbox" aria-label="Select all" checked={selected.length === shown.length && shown.length > 0} onChange={() => setSelected(selected.length === shown.length ? [] : shown.map(x => x.id))}/></span><span>PAYEE</span><span>CATEGORY</span><span>LAST PAYMENT</span><span>PAYMENT AMOUNT</span><span></span></div>{shown.map(p => <div className="table-row" key={p.id}><span><input type="checkbox" checked={selected.includes(p.id)} onChange={() => toggle(p.id)} aria-label={`Select ${p.name}`}/></span><span className="payee-name"><i className={'avatar tone-' + p.id}>{p.initials}</i><span><strong>{p.name}</strong><small>{p.role}</small></span></span><span><b className={'tag ' + p.category.toLowerCase()}>{p.category}</b></span><span>{p.lastPayment}</span><span><strong>{p.amount}</strong><small className={p.status === 'Ready' ? 'ready' : 'pending'}><i></i>{p.status}</small></span><span className="row-actions"><button onClick={() => action(`Payment started for ${p.name}.`)}>Pay</button><button onClick={() => action(`Editing ${p.name}.`)}>•••</button></span></div>)}</div><footer className="table-footer"><span>Showing <b>1–{shown.length}</b> of <b>{payees.length}</b> payees</span><div><button disabled>‹</button><button className="page">1</button><button>2</button><button>3</button><button>›</button></div></footer></section>
+      <section id="transactions" className="activity"><div className="activity-title"><div><p>RECENT ACTIVITY</p><h2>Latest transactions</h2></div><button onClick={() => action('Opening all transactions.')}>View all →</button></div><div className="activity-list">{activity.map(([name, desc, sum, date, avatar]) => <div className="activity-row" key={name}><i className="avatar tone-2">{avatar}</i><div><strong>{name}</strong><span>{desc}</span></div><div><b className={sum.startsWith('+') ? 'positive' : ''}>{sum}</b><span>{date}</span></div></div>)}</div></section></> : <PersonalView action={action} />}</main>
+    {notice && <div className="toast">✓ {notice}</div>}{showAdd && <div className="modal-backdrop"><form className="modal" onSubmit={(e) => { e.preventDefault(); setShowAdd(false); action('New payee added successfully.') }}><button type="button" className="close" onClick={() => setShowAdd(false)}>×</button><p>PAYEE ADMINISTRATOR</p><h2>Add a new payee</h2><label>Full name<input required placeholder="e.g. Mariam Adebayo" /></label><label>Category<select><option>Construction</option><option>Staff</option><option>Suppliers</option></select></label><label>Role or company<input required placeholder="e.g. Site engineer" /></label><button className="primary-btn" type="submit">Add payee</button></form></div>}</div>
 }
+function PersonalView({ action }: { action: (message: string) => void }) { return <section className="personal-view"><div className="welcome"><div><p>WELCOME BACK, ELENA</p><h1>Personal overview</h1><span>Manage your everyday money with confidence.</span></div></div><article className="personal-balance"><span>AVAILABLE BALANCE</span><h2>$6,842.30</h2><div><button className="primary-btn" onClick={() => action('Send money flow opened.')}>↑ Send money</button><button className="outline-btn" onClick={() => action('Your receiving details are ready.')}>↓ Receive money</button></div></article><section className="personal-grid"><article><p>THIS MONTH</p><h3>Income <b>+$4,280.00</b></h3><h3>Spent <b className="dark">-$1,837.60</b></h3></article><article><p>QUICK ACTIONS</p><button onClick={() => action('Transfer flow opened.')}>⇄ Transfer money</button><button onClick={() => action('Transaction history opened.')}>▤ View transactions</button></article></section></section> }
