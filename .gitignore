@@ -4,4 +4,5 @@ dist/
 .env.local
 coverage/
 *.log
+*.tsbuildinfo
 backend/prisma/dev.db
