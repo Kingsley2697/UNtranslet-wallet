@@ -6,7 +6,7 @@ export default function App() {
       <header className="site-header">
         <a className="brand" href="#home" aria-label="UNtranslet Wallet home">A2B</a>
         <nav className="main-nav" aria-label="Main navigation">
-          {navItems.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}{item !== 'Home' && <span className="chevron">⌄</span>}</a>)}
+          {navItems.map((item) => <a key={item} href={`#${item.toLowerCase()}`}>{item}{item !== 'Home' && <span className="chevron" aria-hidden="true" />}</a>)}
         </nav>
         <div className="actions">
           <button className="login">Login</button>
